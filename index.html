@@ -106,13 +106,13 @@
     <div class="card">
       <div class="profile-name">You</div>
       <textarea id="postInput" placeholder="What's on your mind?"></textarea>
-      <button onclick="addPost()">Post</button>
+      <button onclick="addPost()">Post 🚀</button>
     </div>
     <div id="feed"></div>
   </div>
 
   <script>
-    let posts = JSON.parse(localStorage.getItem("miniSocialPosts")) || [];
+    let posts = [];
 
     function renderPosts() {
       const feed = document.getElementById("feed");
@@ -132,7 +132,7 @@
           <div class="profile-name">User</div>
           <p>${p.text}</p>
           <div class="actions">
-            <button class="like-btn" onclick="likePost(${i}, this)">❤️</button>
+            <button class="like-btn" onclick="likePost(${i})">❤️</button>
             <span>${p.likes} Likes</span>
           </div>
           <div class="comments">${commentsHTML}</div>
@@ -147,14 +147,12 @@
       const input = document.getElementById("postInput");
       if (input.value.trim() === "") return;
       posts.unshift({ text: input.value, likes: 0, comments: [] });
-      localStorage.setItem("miniSocialPosts", JSON.stringify(posts));
       input.value = "";
       renderPosts();
     }
 
-    function likePost(index, btn) {
+    function likePost(index) {
       posts[index].likes++;
-      localStorage.setItem("miniSocialPosts", JSON.stringify(posts));
       renderPosts();
     }
 
@@ -162,12 +160,176 @@
       const input = document.getElementById(`comment-${index}`);
       if (input.value.trim() === "") return;
       posts[index].comments.push(input.value);
-      localStorage.setItem("miniSocialPosts", JSON.stringify(posts));
+      input.value = "";
+      renderPosts();
+    }
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Social App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #f6d365, #fda085);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      margin-top: 20px;
+    }
+
+    .card, .post-card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity:0; transform: translateY(20px);}
+      to {opacity:1; transform: translateY(0);}
+    }
+
+    .profile-name {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    textarea, input[type=text] {
+      width: 100%;
+      border-radius: 10px;
+      padding: 10px;
+      border: 2px solid #ff6b81;
+      resize: none;
+      font-size: 1em;
+      outline: none;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #ff6b81, #ff4757);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .post-card p {
+      margin: 0;
+      font-size: 1.1em;
+      color: #2f3542;
+    }
+
+    .actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .like-btn {
+      background: none;
+      border: none;
+      color: #ff4757;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    .comments {
+      margin-top: 10px;
+      font-size: 0.95em;
+      color: #555;
+    }
+
+    .comment {
+      background: #f0f0f0;
+      padding: 5px 8px;
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="profile-name">You</div>
+      <textarea id="postInput" placeholder="What's on your mind?"></textarea>
+      <button onclick="addPost()">Post</button>
+    </div>
+    <div id="feed"></div>
+  </div>
+
+  <script>
+    let posts = [];
+
+    function renderPosts() {
+      const feed = document.getElementById("feed");
+      feed.innerHTML = "";
+      posts.forEach((p, i) => {
+        const post = document.createElement("div");
+        post.className = "card post-card";
+
+        let commentsHTML = "";
+        if (p.comments) {
+          p.comments.forEach(c => {
+            commentsHTML += `<div class="comment">${c}</div>`;
+          });
+        }
+
+        post.innerHTML = `
+          <div class="profile-name">User</div>
+          <p>${p.text}</p>
+          <div class="actions">
+            <button class="like-btn" onclick="likePost(${i})">❤️</button>
+            <span>${p.likes} Likes</span>
+          </div>
+          <div class="comments">${commentsHTML}</div>
+          <input type="text" id="comment-${i}" placeholder="Add a comment..."/>
+          <button onclick="addComment(${i})">Comment</button>
+        `;
+        feed.appendChild(post);
+      });
+    }
+
+    function addPost() {
+      const input = document.getElementById("postInput");
+      if (input.value.trim() === "") return;
+      posts.unshift({ text: input.value, likes: 0, comments: [] });
       input.value = "";
       renderPosts();
     }
 
-    renderPosts();
+    function likePost(index) {
+      posts[index].likes++;
+      renderPosts();
+    }
+
+    function addComment(index) {
+      const input = document.getElementById(`comment-${index}`);
+      if (input.value.trim() === "") return;
+      posts[index].comments.push(input.value);
+      input.value = "";
+      renderPosts();
+    }
   </script>
 </body>
 </html>
